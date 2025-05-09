@@ -1,18 +1,23 @@
 import 'dart:math';
 
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flappy_dash/components/background.dart';
 import 'package:flappy_dash/components/barrier.dart';
+import 'package:flappy_dash/components/score_zone.dart';
+import 'package:flutter/material.dart';
 
 import 'components/player.dart';
 
 class MyGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   late Player _player;
   late SpawnComponent _barrierSpawner;
+  late TextComponent _scoreText;
   final Random _random = Random();
+  int _score = 0;
 
   MyGame() {
     _player = Player();
@@ -31,6 +36,7 @@ class MyGame extends FlameGame with TapCallbacks, HasCollisionDetection {
     await _createBackground();
     await _createBarrier();
     await _createBarrierSpawner();
+    _createScoreDisplay();
   }
 
   Future<void> _createPlayer() async {
@@ -59,8 +65,15 @@ class MyGame extends FlameGame with TapCallbacks, HasCollisionDetection {
       ),
       isInverted: true,
     );
+
+    final scoreZone = ScoreZone(
+      position: Vector2(barrier.position.x, barrier.position.y - size.y / 2),
+      size: Vector2(10, size.y / 2),
+    );
+
     add(barrier);
     add(invertedBarrier);
+    add(scoreZone);
   }
 
   Future<void> _createBarrierSpawner() async {
@@ -74,11 +87,17 @@ class MyGame extends FlameGame with TapCallbacks, HasCollisionDetection {
           ),
           isInverted: true,
         );
+        final scoreZone = ScoreZone(
+          position:
+              Vector2(barrier.position.x, barrier.position.y - size.y / 2),
+          size: Vector2(10, size.y / 2),
+        );
         add(invertedBarrier);
+        add(scoreZone);
         return barrier;
       },
-      minPeriod: 1.2,
-      maxPeriod: 3,
+      minPeriod: 2,
+      maxPeriod: 6,
       selfPositioning: true,
     );
     add(_barrierSpawner);
@@ -95,5 +114,44 @@ class MyGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   void onTapDown(TapDownEvent event) {
     _player.fly();
     super.onTapDown(event);
+  }
+
+  void _createScoreDisplay() {
+    _score = 0;
+    _scoreText = TextComponent(
+      text: '0',
+      anchor: Anchor.topCenter,
+      position: Vector2(size.x / 2, 20),
+      priority: 10,
+      textRenderer: TextPaint(
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 48,
+          fontWeight: FontWeight.bold,
+          shadows: [
+            Shadow(
+              color: Colors.black,
+              offset: Offset(2, 2),
+              blurRadius: 2,
+            ),
+          ],
+        ),
+      ),
+    );
+    add(_scoreText);
+  }
+
+  void incrementScore() {
+    _score++;
+    _scoreText.text = _score.toString();
+    final ScaleEffect scaleEffect = ScaleEffect.to(
+      Vector2.all(2),
+      EffectController(
+        duration: 0.1,
+        curve: Curves.easeInOut,
+        alternate: true,
+      ),
+    );
+    _scoreText.add(scaleEffect);
   }
 }
