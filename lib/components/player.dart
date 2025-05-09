@@ -1,8 +1,11 @@
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flappy_dash/components/barrier.dart';
 
 import '../my_game.dart';
 
-class Player extends SpriteComponent with HasGameReference<MyGame> {
+class Player extends SpriteComponent
+    with HasGameReference<MyGame>, CollisionCallbacks {
   bool _isOpen = true;
   final Vector2 _movement = Vector2(0, 0);
   final double _gravity = 600.0;
@@ -12,6 +15,7 @@ class Player extends SpriteComponent with HasGameReference<MyGame> {
   Future<void> onLoad() async {
     super.onLoad();
     sprite = await game.loadSprite('bird_open.png');
+    add(RectangleHitbox());
   }
 
   @override
@@ -29,5 +33,13 @@ class Player extends SpriteComponent with HasGameReference<MyGame> {
       sprite = await game.loadSprite('bird_open.png');
     }
     _isOpen = !_isOpen;
+  }
+
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollision(intersectionPoints, other);
+    if (other is Barrier) {
+      print('collision');
+    }
   }
 }
