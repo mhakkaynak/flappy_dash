@@ -1,6 +1,7 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flappy_dash/components/barrier.dart';
+import 'package:flappy_dash/components/score_zone.dart';
 
 import '../my_game.dart';
 
@@ -10,6 +11,7 @@ class Player extends SpriteComponent
   final Vector2 _movement = Vector2(0, 0);
   final double _gravity = 600.0;
   final double _jumpForce = -100.0;
+  final Map<String, bool> _scoredZones = {};
 
   @override
   Future<void> onLoad() async {
@@ -38,8 +40,10 @@ class Player extends SpriteComponent
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
-    if (other is Barrier) {
-      print('collision');
+    if (other is Barrier) {}
+    if (other is ScoreZone && _scoredZones[other.id] != true) {
+      _scoredZones[other.id] = true;
+      game.incrementScore();
     }
   }
 }

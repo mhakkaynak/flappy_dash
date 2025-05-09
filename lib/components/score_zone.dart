@@ -5,28 +5,19 @@ import 'player.dart';
 
 class ScoreZone extends PositionComponent
     with HasGameReference<MyGame>, CollisionCallbacks {
-  bool _hasScored = false;
-
-  ScoreZone({required super.position, required super.size});
+  final String id;
+  ScoreZone({required super.position, required super.size, required this.id});
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    add(RectangleHitbox());
+    priority = 1;
+    add(CircleHitbox());
   }
 
   @override
   void update(double dt) {
     super.update(dt);
     position.x -= 100 * dt;
-  }
-
-  @override
-  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    super.onCollision(intersectionPoints, other);
-    if (other is Player && !_hasScored) {
-      _hasScored = true;
-      game.incrementScore();
-    }
   }
 }

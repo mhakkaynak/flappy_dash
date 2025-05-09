@@ -27,6 +27,7 @@ class MyGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   Future<void> onLoad() async {
     await Flame.device.fullScreen();
     await Flame.device.setPortrait();
+    debugMode = true;
     await startGame();
     super.onLoad();
   }
@@ -65,12 +66,11 @@ class MyGame extends FlameGame with TapCallbacks, HasCollisionDetection {
       ),
       isInverted: true,
     );
-
     final scoreZone = ScoreZone(
       position: Vector2(barrier.position.x, barrier.position.y - size.y / 2),
-      size: Vector2(10, size.y / 2),
+      size: _player.size,
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
     );
-
     add(barrier);
     add(invertedBarrier);
     add(scoreZone);
@@ -89,8 +89,9 @@ class MyGame extends FlameGame with TapCallbacks, HasCollisionDetection {
         );
         final scoreZone = ScoreZone(
           position:
-              Vector2(barrier.position.x, barrier.position.y - size.y / 2),
-          size: Vector2(10, size.y / 2),
+              Vector2(barrier.position.x, barrier.position.y - size.y / 1.5),
+          size: Vector2(_player.size.x, _player.size.y + 200),
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
         );
         add(invertedBarrier);
         add(scoreZone);
@@ -121,20 +122,13 @@ class MyGame extends FlameGame with TapCallbacks, HasCollisionDetection {
     _scoreText = TextComponent(
       text: '0',
       anchor: Anchor.topCenter,
-      position: Vector2(size.x / 2, 20),
+      position: Vector2(size.x / 2, 50),
       priority: 10,
       textRenderer: TextPaint(
         style: TextStyle(
           color: Colors.white,
           fontSize: 48,
           fontWeight: FontWeight.bold,
-          shadows: [
-            Shadow(
-              color: Colors.black,
-              offset: Offset(2, 2),
-              blurRadius: 2,
-            ),
-          ],
         ),
       ),
     );
