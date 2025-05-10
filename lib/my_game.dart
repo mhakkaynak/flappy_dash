@@ -17,6 +17,9 @@ class MyGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   late SpawnComponent _barrierSpawner;
   late TextComponent _scoreText;
   final Random _random = Random();
+  late TextComponent _gameOverText;
+  late Background _background;
+  final List<Barrier> _barriers = [];
   int _score = 0;
 
   MyGame() {
@@ -35,7 +38,6 @@ class MyGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   Future<void> startGame() async {
     await _createPlayer();
     await _createBackground();
-    await _createBarrier();
     await _createBarrierSpawner();
     _createScoreDisplay();
   }
@@ -49,31 +51,12 @@ class MyGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   }
 
   Future<void> _createBackground() async {
-    final background = Background();
-    background.position = Vector2(size.x / 2, size.y / 2);
-    background.size = Vector2(size.x, size.y);
-    background.anchor = Anchor.center;
-    background.priority = 0;
-    add(background);
-  }
-
-  Future<void> _createBarrier() async {
-    final barrier = Barrier(position: _generateRandomPosition());
-    final invertedBarrier = Barrier(
-      position: Vector2(
-        barrier.position.x,
-        barrier.position.y - size.y,
-      ),
-      isInverted: true,
-    );
-    final scoreZone = ScoreZone(
-      position: Vector2(barrier.position.x, barrier.position.y - size.y / 2),
-      size: _player.size,
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-    );
-    add(barrier);
-    add(invertedBarrier);
-    add(scoreZone);
+    _background = Background();
+    _background.position = Vector2(size.x / 2, size.y / 2);
+    _background.size = Vector2(size.x, size.y);
+    _background.anchor = Anchor.center;
+    _background.priority = 0;
+    add(_background);
   }
 
   Future<void> _createBarrierSpawner() async {
@@ -93,6 +76,8 @@ class MyGame extends FlameGame with TapCallbacks, HasCollisionDetection {
           size: Vector2(_player.size.x, _player.size.y + 200),
           id: DateTime.now().millisecondsSinceEpoch.toString(),
         );
+        _barriers.add(barrier);
+        _barriers.add(invertedBarrier);
         add(invertedBarrier);
         add(scoreZone);
         return barrier;
@@ -147,5 +132,28 @@ class MyGame extends FlameGame with TapCallbacks, HasCollisionDetection {
       ),
     );
     _scoreText.add(scaleEffect);
+  }
+
+  void gameOver() {
+    _gameOverText = TextComponent(
+      text: 'Game Over',
+      anchor: Anchor.center,
+      position: Vector2(size.x / 2, size.y / 2),
+      priority: 10,
+      textRenderer: TextPaint(
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 48,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+    add(_gameOverText);
+    _player.removeFromParent();
+    _background.stop();
+    _barrierSpawner.removeFromParent();
+    for (final barrier in _barriers) {
+      barrier.stop();
+    }
   }
 }

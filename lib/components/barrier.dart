@@ -7,6 +7,7 @@ import '../my_game.dart';
 
 class Barrier extends SpriteComponent with HasGameReference<MyGame> {
   final bool isInverted;
+  bool _isStopped = false;
   Barrier({required super.position, this.isInverted = false});
 
   @override
@@ -25,6 +26,12 @@ class Barrier extends SpriteComponent with HasGameReference<MyGame> {
   @override
   void update(double dt) {
     super.update(dt);
-    position.x -= 100 * dt;
+    if (!_isStopped) {
+      position.x -= 100 * dt;
+    }
+  }
+
+  void stop() {
+    _isStopped = true;
   }
 }

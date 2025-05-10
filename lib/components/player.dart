@@ -40,7 +40,9 @@ class Player extends SpriteComponent
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
-    if (other is Barrier) {}
+    if (other is Barrier) {
+      game.gameOver();
+    }
     if (other is ScoreZone && _scoredZones[other.id] != true) {
       _scoredZones[other.id] = true;
       game.incrementScore();

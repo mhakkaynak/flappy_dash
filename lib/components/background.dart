@@ -3,6 +3,8 @@ import 'package:flame/components.dart';
 import '../my_game.dart';
 
 class Background extends SpriteComponent with HasGameReference<MyGame> {
+  bool _isStopped = false;
+
   @override
   Future<void> onLoad() async {
     super.onLoad();
@@ -19,9 +21,15 @@ class Background extends SpriteComponent with HasGameReference<MyGame> {
   @override
   void update(double dt) {
     super.update(dt);
-    position.x -= 100 * dt;
-    if (position.x * 2 <= -size.x) {
-      position.x = size.x / 2;
+    if (!_isStopped) {
+      position.x -= 100 * dt;
+      if (position.x * 2 <= -size.x) {
+        position.x = size.x / 2;
+      }
     }
+  }
+
+  void stop() {
+    _isStopped = true;
   }
 }
