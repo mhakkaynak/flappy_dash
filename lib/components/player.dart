@@ -30,6 +30,9 @@ class Player extends SpriteComponent
   void update(double dt) {
     _movement.y += _gravity * dt;
     position += _movement.normalized() * 300 * dt;
+    if (position.y < 0 || position.y > game.size.y) {
+      game.gameOver();
+    }
     super.update(dt);
   }
 
