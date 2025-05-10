@@ -1,1 +1,1 @@
-![image](https://github.com/user-attachments/assets/6fe097e4-cfcb-467f-8349-874b83fe6833)![Simulator Screenshot - iPhone 14 Plus - 2025-05-10 at 20 16 03](https://github.com/user-attachments/assets/aff8a232-e0e4-4cf4-8ce3-9a5ff04e6745)
+![Simulator Screenshot - iPhone 14 Plus - 2025-05-10 at 20 16 03](https://github.com/user-attachments/assets/33e4fc57-dee3-4eb4-997e-2ebae17d155a)
