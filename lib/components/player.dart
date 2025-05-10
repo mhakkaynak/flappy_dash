@@ -13,6 +13,12 @@ class Player extends SpriteComponent
   final double _jumpForce = -100.0;
   final Map<String, bool> _scoredZones = {};
 
+  Player() {
+    _movement.setZero();
+    _scoredZones.clear();
+    _isOpen = true;
+  }
+
   @override
   Future<void> onLoad() async {
     super.onLoad();

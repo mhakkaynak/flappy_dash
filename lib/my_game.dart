@@ -13,17 +13,40 @@ import 'package:flutter/material.dart';
 import 'components/player.dart';
 
 class MyGame extends FlameGame with TapCallbacks, HasCollisionDetection {
+  static final ValueNotifier<bool> isGameOver = ValueNotifier<bool>(false);
+  static MyGame? _instance;
+
   late Player _player;
   late SpawnComponent _barrierSpawner;
   late TextComponent _scoreText;
   final Random _random = Random();
-  late TextComponent _gameOverText;
   late Background _background;
   final List<Barrier> _barriers = [];
+  final List<ScoreZone> _scoreZones = [];
   int _score = 0;
 
   MyGame() {
     _player = Player();
+    _instance = this;
+  }
+
+  static void resetGame() {
+    _instance?.reset();
+  }
+
+  Future<void> reset() async {
+    for (final barrier in _barriers) {
+      barrier.removeFromParent();
+    }
+    for (final scoreZone in _scoreZones) {
+      scoreZone.removeFromParent();
+    }
+    _barriers.clear();
+    _scoreZones.clear();
+    _scoreText.removeFromParent();
+    _score = 0;
+    isGameOver.value = false;
+    await startGame();
   }
 
   @override
@@ -43,11 +66,15 @@ class MyGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   }
 
   Future<void> _createPlayer() async {
-    _player.position = Vector2(size.x / 2, size.y / 2);
-    _player.size = Vector2(size.x / 4, size.y / 4);
-    _player.anchor = Anchor.center;
-    _player.priority = 1;
-    add(_player);
+    if (!children.contains(_player)) {
+      _player.position = Vector2(size.x / 2, size.y / 2);
+      _player.size = Vector2(size.x / 4, size.y / 4);
+      _player.anchor = Anchor.center;
+      _player.priority = 1;
+      add(_player);
+    } else {
+      _player.position = Vector2(size.x / 2, size.y / 2);
+    }
   }
 
   Future<void> _createBackground() async {
@@ -78,6 +105,7 @@ class MyGame extends FlameGame with TapCallbacks, HasCollisionDetection {
         );
         _barriers.add(barrier);
         _barriers.add(invertedBarrier);
+        _scoreZones.add(scoreZone);
         add(invertedBarrier);
         add(scoreZone);
         return barrier;
@@ -135,20 +163,7 @@ class MyGame extends FlameGame with TapCallbacks, HasCollisionDetection {
   }
 
   void gameOver() {
-    _gameOverText = TextComponent(
-      text: 'Game Over',
-      anchor: Anchor.center,
-      position: Vector2(size.x / 2, size.y / 2),
-      priority: 10,
-      textRenderer: TextPaint(
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 48,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-    add(_gameOverText);
+    isGameOver.value = true;
     _player.removeFromParent();
     _background.stop();
     _barrierSpawner.removeFromParent();
